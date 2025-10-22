@@ -44,15 +44,15 @@
   </style>
 </head>
 <body>
-  <h1>Upload Ảnh Lên Cloudinary của Tấn 🍹</h1>
+  <h1>Upload Ảnh Lên Cloudinary của Tan</h1>
   <button id="upload_widget">Chọn Ảnh để Upload</button>
 
   <div id="result"></div>
   <img id="preview" class="preview" style="display:none"/>
 
   <script>
-    const cloudName = 'do48qpmut';     // 👈 Cloud name của bro
-    const uploadPreset = 'buble tea';  // 👈 Tên preset bro đã tạo
+    const cloudName = 'do48qpmut';
+    const uploadPreset = 'buble tea';
 
     const widget = cloudinary.createUploadWidget({
       cloudName: cloudName,
@@ -60,7 +60,7 @@
       folder: 'uploads',
       sources: ['local', 'camera'],
       multiple: false,
-      maxFileSize: 5000000, // 5MB
+      maxFileSize: 5000000,
       cropping: false,
       resourceType: 'image'
     }, (error, result) => {
@@ -79,3 +79,4 @@
   </script>
 </body>
 </html>
+
