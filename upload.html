@@ -3,81 +3,249 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Ảnh Lên Cloudinary của Tan </title>
+  <title>Minimalist Uploader</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --background-color: #f4f4f5; --card-background: #ffffff; --text-primary: #18181b; --text-secondary: #71717a; --border-color: #e4e4e7; --accent-color: #18181b; --success-color: #16a34a; --font-family: 'Inter', sans-serif;
+    }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f9f9f9, #e6f3ff);
-      text-align: center;
-      padding: 60px 20px;
+      font-family: var(--font-family); background-color: var(--background-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
-    h1 {
-      color: #333;
-      margin-bottom: 20px;
+    .uploader-card {
+      background: var(--card-background); border-radius: 1rem; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); width: 100%; max-width: 400px; padding: 2.5rem; text-align: center; transition: all 0.3s ease;
     }
-    button {
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
+    .state { display: none; }
+    .state.active { display: block; }
+    h2 {
+      color: var(--text-primary); font-size: 1.5rem; font-weight: 600; margin: 0 0 0.5rem;
     }
-    button:hover {
-      background: #45a049;
+    .subtitle {
+      color: var(--text-secondary); font-size: 1rem; line-height: 1.5; margin-bottom: 2rem;
     }
-    #result {
-      margin-top: 30px;
-      font-size: 16px;
-      color: #333;
-      word-wrap: break-word;
+    .dropzone {
+      border: 2px dashed var(--border-color); border-radius: 0.75rem; padding: 2rem; cursor: pointer; transition: border-color 0.2s, background-color 0.2s;
     }
-    .preview {
-      margin-top: 20px;
-      max-width: 300px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    .dropzone:hover {
+      border-color: var(--accent-color); background-color: #fafafa;
     }
+    /* ✅ CSS MỚI ĐÃ THÊM VÀO ĐÂY */
+    .dropzone.dragover {
+      border-color: var(--accent-color);
+      background-color: #fafafa;
+    }
+    .dropzone-icon {
+      width: 48px; height: 48px; color: var(--accent-color); margin: 0 auto 1rem;
+    }
+    .dropzone p {
+      margin: 0; color: var(--text-primary); font-weight: 500;
+    }
+    .dropzone span {
+      font-size: 0.875rem; color: var(--text-secondary);
+    }
+    .divider {
+      margin: 1.5rem auto; color: var(--text-secondary); font-weight: 500; font-size: 0.875rem;
+    }
+    .progress-bar {
+      background-color: var(--border-color); border-radius: 999px; height: 8px; width: 100%; margin: 2rem 0 1rem; overflow: hidden;
+    }
+    .progress-bar-fill {
+      background-color: var(--accent-color); height: 100%; width: 0%; border-radius: 999px; transition: width 0.3s ease;
+    }
+    .uploading-text {
+      font-weight: 500; color: var(--text-primary);
+    }
+    .preview-image {
+      width: 100%; height: auto; max-height: 250px; object-fit: cover; border-radius: 0.75rem; margin-top: 1rem; border: 1px solid var(--border-color);
+    }
+    .result-link-container {
+      display: flex; align-items: center; background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem 1rem; margin: 1.5rem 0; text-align: left;
+    }
+    .result-link-container input {
+      flex-grow: 1; border: none; background: transparent; outline: none; color: var(--text-secondary); font-family: var(--font-family); font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .action-buttons {
+      display: flex; gap: 0.75rem; justify-content: center;
+    }
+    .btn {
+      font-family: var(--font-family); border: none; padding: 0.75rem 1.5rem; font-size: 1rem; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s ease; font-weight: 500; flex-grow: 1;
+    }
+    .btn-primary {
+      background-color: var(--accent-color); color: var(--card-background);
+    }
+    .btn-primary:hover {
+      opacity: 0.85;
+    }
+    .btn-secondary {
+      background-color: var(--card-background); color: var(--text-primary); border: 1px solid var(--border-color);
+    }
+    .btn-secondary:hover {
+      background-color: var(--background-color); border-color: var(--text-secondary);
+    }
+    #copy-btn {
+      flex-grow: 0; padding: 0.5rem; background: transparent; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1.1rem;
+    }
+    #copy-btn:hover { color: var(--text-primary); }
   </style>
 </head>
 <body>
-  <h1>Upload Ảnh Lên Cloudinary của Tan</h1>
-  <button id="upload_widget">Chọn Ảnh để Upload</button>
 
-  <div id="result"></div>
-  <img id="preview" class="preview" style="display:none"/>
+  <div class="uploader-card">
+    
+    <div id="initial-state" class="state active">
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
+        </div>
+        <p>Kéo và thả tệp vào đây</p>
+        <span>Giới hạn 5MB mỗi ảnh</span>
+      </div>
+      <div class="divider">HOẶC</div>
+      <button id="upload_widget" class="btn btn-primary" style="width: 100%;">Chọn Tệp Từ Máy</button>
+    </div>
+
+    <div id="uploading-state" class="state">
+      <h2>Đang tải lên...</h2>
+      <p class="subtitle">Tệp của bạn đang được xử lý, vui lòng chờ.</p>
+      <div class="progress-bar">
+        <div id="progress-bar-fill" class="progress-bar-fill"></div>
+      </div>
+      <p id="uploading-percentage" class="uploading-text">0%</p>
+    </div>
+
+    <div id="success-state" class="state">
+      <h2>Tải Lên Hoàn Tất!</h2>
+      <p class="subtitle">Ảnh của bạn đã được tải lên thành công.</p>
+      <img id="preview" class="preview-image" alt="Image preview"/>
+      <div class="result-link-container">
+        <input type="text" id="result-link-input" readonly>
+        <button id="copy-btn" title="Copy link">
+          <i id="copy-icon-default" class="fa-solid fa-copy"></i>
+          <i id="copy-icon-success" class="fa-solid fa-check" style="display:none; color: var(--success-color);"></i>
+        </button>
+      </div>
+      <div class="action-buttons">
+        <button id="reset-btn" class="btn btn-secondary">Tải Ảnh Khác</button>
+      </div>
+    </div>
+  </div>
 
   <script>
+    // --- Config ---
     const cloudName = 'do48qpmut';
     const uploadPreset = 'buble tea';
+    let uploadedUrl = '';
 
+    // --- DOM Elements ---
+    const states = {
+      initial: document.getElementById('initial-state'),
+      uploading: document.getElementById('uploading-state'),
+      success: document.getElementById('success-state'),
+    };
+    const dropzone = document.getElementById('dropzone');
+    const uploadButton = document.getElementById('upload_widget');
+    const progressBarFill = document.getElementById('progress-bar-fill');
+    const uploadingPercentage = document.getElementById('uploading-percentage');
+    const previewImage = document.getElementById('preview');
+    const resultLinkInput = document.getElementById('result-link-input');
+    const copyBtn = document.getElementById('copy-btn');
+    const copyIconDefault = document.getElementById('copy-icon-default');
+    const copyIconSuccess = document.getElementById('copy-icon-success');
+    const resetBtn = document.getElementById('reset-btn');
+
+    // ✅ JAVASCRIPT MỚI ĐÃ THÊM VÀO ĐÂY
+    // --- Drag & Drop Event Handlers ---
+    dropzone.addEventListener('dragenter', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault(); // Rất quan trọng, ngăn trình duyệt mở file
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault(); // Rất quan trọng, ngăn trình duyệt mở file
+      dropzone.classList.remove('dragover');
+      openWidget(); // Mở widget khi người dùng thả file
+    });
+    
+    // --- State Manager ---
+    function showState(stateName) {
+      Object.values(states).forEach(state => state.classList.remove('active'));
+      states[stateName].classList.add('active');
+    }
+
+    // --- Cloudinary Widget ---
     const widget = cloudinary.createUploadWidget({
       cloudName: cloudName,
       uploadPreset: uploadPreset,
       folder: 'uploads',
-      sources: ['local', 'camera'],
+      sources: ['local', 'camera', 'url'],
       multiple: false,
-      maxFileSize: 5000000,
-      cropping: false,
+      cropping: true,
       resourceType: 'image'
     }, (error, result) => {
-      if (!error && result && result.event === "success") {
-        console.log('Upload thành công:', result.info.secure_url);
-        document.getElementById("result").innerHTML = `
-          ✅ <b>Ảnh đã upload thành công!</b><br>
-          <a href="${result.info.secure_url}" target="_blank">${result.info.secure_url}</a>
-        `;
-        document.getElementById("preview").src = result.info.secure_url;
-        document.getElementById("preview").style.display = "block";
+      if (error) {
+        console.error('Upload Error:', error);
+        alert('Có lỗi xảy ra, vui lòng thử lại.');
+        showState('initial');
+        return;
+      }
+      if (result.event === 'close' && !states.success.classList.contains('active')) {
+        showState('initial');
+      }
+      if (result.event === 'upload-progress') {
+        const percent = Math.round(result.info.progress);
+        progressBarFill.style.width = percent + '%';
+        uploadingPercentage.textContent = percent + '%';
+      }
+      if (result.event === "success") {
+        uploadedUrl = result.info.secure_url;
+        previewImage.src = uploadedUrl;
+        resultLinkInput.value = uploadedUrl;
+        copyIconDefault.style.display = 'block';
+        copyIconSuccess.style.display = 'none';
+        showState('success');
       }
     });
 
-    document.getElementById("upload_widget").addEventListener("click", () => widget.open(), false);
+    // --- Event Listeners ---
+    const openWidget = () => {
+      showState('uploading');
+      progressBarFill.style.width = '0%';
+      uploadingPercentage.textContent = '0%';
+      widget.open();
+    };
+    uploadButton.addEventListener("click", openWidget, false);
+    dropzone.addEventListener("click", openWidget, false);
+    
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(uploadedUrl).then(() => {
+        copyIconDefault.style.display = 'none';
+        copyIconSuccess.style.display = 'block';
+        setTimeout(() => {
+          copyIconDefault.style.display = 'block';
+          copyIconSuccess.style.display = 'none';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Sao chép thất bại!');
+      });
+    });
+
+    resetBtn.addEventListener('click', () => {
+      showState('initial');
+    });
   </script>
 </body>
 </html>
-
-
