@@ -187,40 +187,49 @@
 
     // --- Cloudinary Widget ---
     const widget = cloudinary.createUploadWidget({
-      cloudName: cloudName,
-      uploadPreset: uploadPreset,
-      folder: 'fora',
-      sources: ['local', 'camera', 'url'],
-      multiple: false,
-      cropping: true,
-      resourceType: 'image'
-    }, (error, result) => {
-      if (error) {
-        console.error('Upload Error:', error);
-        alert('Có lỗi xảy ra, vui lòng thử lại.');
-        showState('initial');
-        return;
-      }
-      if (result.event === 'close' && !states.success.classList.contains('active')) {
-        showState('initial');
-      }
-      if (result.event === 'upload-progress') {
-        const percent = Math.round(result.info.progress);
-        progressBarFill.style.width = percent + '%';
-        uploadingPercentage.textContent = percent + '%';
-      }
-      if (result.event === "success") {
-        uploadedUrl = result.info.secure_url;
-        previewImage.src = uploadedUrl;
-        resultLinkInput.value = uploadedUrl;
-        copyIconDefault.style.display = 'block';
-        copyIconSuccess.style.display = 'none';
-        showState('success');
-      }
-    });
+  cloudName: cloudName,
+  uploadPreset: uploadPreset,
+  sources: ['local', 'camera', 'url'],
+  multiple: false,
+  cropping: true,
+  resourceType: 'image'
+}, (error, result) => {
+  if (error) {
+    console.error('Upload Error:', error);
+    alert('Có lỗi xảy ra, vui lòng thử lại.');
+    showState('initial');
+    return;
+  }
+
+  if (result.event === 'close' && !states.success.classList.contains('active')) {
+    showState('initial');
+  }
+
+  if (result.event === 'upload-progress') {
+    const percent = Math.round(result.info.progress);
+    progressBarFill.style.width = percent + '%';
+    uploadingPercentage.textContent = percent + '%';
+  }
+
+  if (result.event === 'success') {
+    uploadedUrl = result.info.secure_url;
+    previewImage.src = uploadedUrl;
+    resultLinkInput.value = uploadedUrl;
+    copyIconDefault.style.display = 'block';
+    copyIconSuccess.style.display = 'none';
+    showState('success');
+  }
+});
+
 
     // --- Event Listeners ---
     const openWidget = () => {
+        widget.update({
+    folder: 'fora',                 // ✅ LUÔN upload vào fora
+    public_id: 'img_' + Date.now(),  // ✅ không sinh folder rác
+    use_filename: false,
+    unique_filename: true
+  });
       showState('uploading');
       progressBarFill.style.width = '0%';
       uploadingPercentage.textContent = '0%';
@@ -249,6 +258,7 @@
   </script>
 </body>
 </html>
+
 
 
 
